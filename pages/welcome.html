@@ -1,264 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IMCTech - Добро пожаловать</title>
-    <style>
-        :root {
-            /* Единая палитра из предыдущих страниц */
-            --bg-main: #0b0e14;
-            --bg-surface: #151921;
-            --bg-input: #0d1117;
-            --border-color: #2a303c;
-            --border-hover: #3b4252;
-            --text-primary: #ffffff;
-            --text-secondary: #8a919e;
-            --text-muted: #4b5563;
-            --accent-blue: #3b82f6;
-            --accent-blue-hover: #2563eb;
-            
-            --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --transition: 0.2s ease;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
-        /* Контейнер приветствия */
-        .welcome-wrapper {
-            width: 100%;
-            max-width: 520px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Шапка */
-        .welcome-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .header-icon {
-            width: 48px;
-            height: 48px;
-            background-color: var(--accent-blue);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.25rem;
-            color: white;
-        }
-
-        .header-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-        }
-
-        .welcome-header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        /* Карточка формы */
-        .create-card {
-            width: 100%;
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 0.75rem 0.9rem;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color var(--transition), box-shadow var(--transition);
-        }
-
-        .form-input::placeholder,
-        .form-textarea::placeholder {
-            color: #4b5563;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .form-textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-
-        .optional-text {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: -0.25rem;
-        }
-
-        /* Информационный блок */
-        .info-box {
-            display: flex;
-            gap: 0.75rem;
-            padding: 0.85rem;
-            background-color: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-        }
-
-        .info-icon {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .info-text {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            line-height: 1.45;
-        }
-
-        /* Кнопка */
-        .btn-primary {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--accent-blue);
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: background-color var(--transition), transform var(--transition);
-            margin-top: 0.25rem;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-blue-hover);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .btn-icon {
-            font-size: 1.1rem;
-            line-height: 1;
-        }
-
-        /* Адаптив */
-        @media (max-width: 480px) {
-            .welcome-wrapper {
-                padding: 0;
-            }
-            .create-card {
-                padding: 1.25rem;
-            }
-            .welcome-header h1 {
-                font-size: 1.35rem;
-            }
-        }
-    </style>
-</head>
-<body>
-
+    <link rel="stylesheet" href="../css/welcome.css" />
+  </head>
+  <body>
     <main class="welcome-wrapper">
-        <div class="welcome-header">
-            <div class="header-icon">
-                <!-- Иконка канбан-доски -->
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="4" y="4" width="4" height="16" rx="1"/>
-                    <rect x="10" y="4" width="4" height="10" rx="1"/>
-                    <rect x="16" y="4" width="4" height="13" rx="1"/>
-                </svg>
-            </div>
-            <h1>Добро пожаловать</h1>
-            <p>У вас пока нет ни одной доски. Создайте первый проект, чтобы начать работу.</p>
+      <div class="welcome-header">
+        <div class="header-icon">
+          <!-- Иконка канбан-доски -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="4" height="16" rx="1" />
+            <rect x="10" y="4" width="4" height="10" rx="1" />
+            <rect x="16" y="4" width="4" height="13" rx="1" />
+          </svg>
+        </div>
+        <h1>Добро пожаловать</h1>
+        <p>
+          У вас пока нет ни одной доски. Создайте первый проект, чтобы начать
+          работу.
+        </p>
+      </div>
+
+      <form
+        class="create-card"
+        onsubmit="
+          event.preventDefault();
+          alert('Доска создана!');
+        "
+      >
+        <div class="form-group">
+          <label class="form-label" for="board-name">Название доски</label>
+          <input
+            type="text"
+            id="board-name"
+            class="form-input"
+            placeholder="Например: IMCTech Kanban"
+            required
+          />
         </div>
 
-        <form class="create-card" onsubmit="event.preventDefault(); alert('Доска создана!');">
-            <div class="form-group">
-                <label class="form-label" for="board-name">Название доски</label>
-                <input type="text" id="board-name" class="form-input" placeholder="Например: IMCTech Kanban" required>
-            </div>
+        <div class="form-group">
+          <label class="form-label" for="board-desc">Описание</label>
+          <textarea
+            id="board-desc"
+            class="form-textarea"
+            placeholder="Краткое описание проекта..."
+          ></textarea>
+          <span class="optional-text">Необязательно</span>
+        </div>
 
-            <div class="form-group">
-                <label class="form-label" for="board-desc">Описание</label>
-                <textarea id="board-desc" class="form-textarea" placeholder="Краткое описание проекта..."></textarea>
-                <span class="optional-text">Необязательно</span>
-            </div>
+        <div class="info-box">
+          <svg
+            class="info-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <p class="info-text">
+            Вы автоматически станете администратором доски. После создания вы
+            сможете пригласить участников и назначить им роли.
+          </p>
+        </div>
 
-            <div class="info-box">
-                <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <p class="info-text">Вы автоматически станете администратором доски. После создания вы сможете пригласить участников и назначить им роли.</p>
-            </div>
-
-            <button type="submit" class="btn-primary">
-                <span class="btn-icon">+</span>
-                Создать доску
-            </button>
-        </form>
+        <button type="submit" class="btn-primary">
+          <span class="btn-icon">+</span>
+          Создать доску
+        </button>
+      </form>
     </main>
 
-</body>
+    <script type="module" src="../js/app.js"></script>
+  </body>
 </html>
