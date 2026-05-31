@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMCTech - Настройки доски</title>
+    <style>
+        :root {
+            /* Базовая палитра */
+            --bg-main: #0b0e14;
+            --bg-surface: #151921;
+            --bg-input: #0d1117;
+            --border-color: #2a303c;
+            --border-hover: #3b4252;
+            --text-primary: #ffffff;
+            --text-secondary: #8a919e;
+            --text-muted: #4b5563;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            
+            /* Цвета ролей и статусов */
+            --role-student: #3b82f6;
+            --role-mentor: #f59e0b;
+            --status-participant: #22c55e;
+            --status-admin: #a855f7;
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            
+            --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: 0.2s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout { display: flex; height: 100%; }
+
+        /* ===== САЙДБАР ===== */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .logo-area {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0 0.5rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem;
+        }
+        .logo-icon {
+            width: 32px; height: 32px; background-color: var(--accent-blue); color: white;
+            font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+        .logo-text { font-weight: 600; letter-spacing: 0.02em; }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem;
+            color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md);
+            font-size: 0.9rem; transition: all var(--transition);
+        }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, 0.04); color: var(--text-primary); }
+        .nav-item.active a { background-color: var(--accent-blue); color: white; font-weight: 500; }
+        
+        /* SVG иконки в навигации */
+        .nav-icon { 
+            width: 18px; height: 18px; 
+            stroke: currentColor; fill: none; stroke-width: 2; 
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .user-profile {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem;
+            border-top: 1px solid var(--border-color); margin-top: auto;
+        }
+        .avatar {
+            width: 32px; height: 32px; background-color: #374151; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); flex-shrink: 0;
+        }
+        .user-info .name { font-size: 0.9rem; font-weight: 500; }
+        .user-info .roles { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        /* Шапка настроек */
+        .settings-header {
+            height: 64px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+        }
+        .page-title { font-size: 1.1rem; font-weight: 600; }
+        
+        /* Кнопки */
+        .btn-primary {
+            padding: 0.6rem 1rem; background-color: var(--accent-blue); border: none;
+            border-radius: var(--radius-md); color: white; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: background-color var(--transition);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-primary:hover { background-color: var(--accent-blue-hover); }
+        
+        /* Иконка сохранения (белая) */
+        .save-icon {
+            width: 16px; height: 16px; fill: white; stroke: none;
+        }
+
+        .btn-secondary {
+            padding: 0.6rem 1rem; background: transparent; border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); color: var(--text-secondary); font-size: 0.85rem;
+            cursor: pointer; transition: all var(--transition); display: flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-secondary:hover { background-color: rgba(255,255,255,0.04); color: var(--text-primary); border-color: var(--border-hover); }
+        .btn-danger {
+            padding: 0.6rem 1rem; background: transparent; border: 1px solid var(--danger);
+            border-radius: var(--radius-md); color: var(--danger); font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: all var(--transition); width: 100%;
+        }
+        .btn-danger:hover { background-color: var(--danger-bg); }
+
+        /* Табы */
+        .settings-tabs {
+            display: flex; gap: 1.5rem; padding: 0 1.5rem; border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+        }
+        .tab-btn {
+            background: none; border: none; padding: 1rem 0; color: var(--text-secondary);
+            font-size: 0.9rem; cursor: pointer; position: relative; transition: color var(--transition);
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--accent-blue); font-weight: 500; }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background-color: var(--accent-blue);
+        }
+
+        /* Контент настроек */
+        .settings-content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        .settings-grid {
+            display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start;
+        }
+
+        /* Карточки */
+        .card {
+            background-color: var(--bg-surface); border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.25rem;
+        }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .card-subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
+
+        /* Форма приглашения */
+        .invite-form { display: flex; flex-direction: column; gap: 1rem; }
+        .form-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .input-field, .select-field {
+            padding: 0.65rem 0.8rem; background-color: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.85rem;
+            outline: none; transition: border-color var(--transition);
+        }
+        .input-field:focus, .select-field:focus { border-color: var(--accent-blue); }
+        .input-field::placeholder { color: var(--text-muted); }
+        .input-field { flex: 2; min-width: 200px; }
+        .select-field { flex: 1; min-width: 120px; cursor: pointer; }
+        
+        .share-link-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .share-link-row .input-field { flex: 1; color: var(--text-secondary); cursor: default; }
+
+        /* Таблица участников */
+        .users-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .users-table th {
+            text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border-color);
+        }
+        .users-table th.text-right { text-align: right; }
+        .users-table td {
+            padding: 1rem 0.5rem; border-bottom: 1px solid var(--border-color); vertical-align: middle;
+        }
+        .users-table tr:last-child td { border-bottom: none; }
+        
+        .user-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .user-cell .avatar { width: 36px; height: 36px; font-size: 0.8rem; }
+        .user-meta { display: flex; flex-direction: column; }
+        .user-name { font-size: 0.9rem; font-weight: 500; }
+        .user-badge {
+            font-size: 0.65rem; padding: 2px 6px; background: rgba(255,255,255,0.08);
+            border-radius: 4px; color: var(--text-secondary); width: fit-content; margin-top: 2px;
+        }
+        .user-email { color: var(--text-secondary); font-size: 0.85rem; }
+
+        /* Табличные селекты */
+        .table-select {
+            padding: 0.4rem 0.6rem; background-color: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.8rem;
+            outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a919e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.8rem;
+        }
+        .table-select:focus { border-color: var(--accent-blue); }
+        .table-select option { background-color: var(--bg-surface); color: var(--text-primary); }
+
+        /* Цвета ролей/статусов */
+        .role-student { color: var(--role-student); border-color: rgba(59, 130, 246, 0.3); }
+        .role-mentor { color: var(--role-mentor); border-color: rgba(245, 158, 11, 0.3); }
+        .status-participant { color: var(--status-participant); border-color: rgba(34, 197, 94, 0.3); }
+        .status-admin { color: var(--status-admin); border-color: rgba(168, 85, 247, 0.3); }
+
+        .action-btn {
+            background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;
+            border-radius: var(--radius-sm); transition: color var(--transition);
+        }
+        .action-btn:hover { color: var(--danger); }
+        .action-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+        /* Правая панель */
+        .info-card { margin-bottom: 1.25rem; }
+        .info-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .role-def { display: flex; gap: 0.75rem; margin-bottom: 0.8rem; font-size: 0.8rem; line-height: 1.4; }
+        .role-def .term { min-width: 60px; font-weight: 500; }
+        .term-student { color: var(--role-student); }
+        .term-mentor { color: var(--role-mentor); }
+        .term-participant { color: var(--status-participant); }
+        .term-admin { color: var(--status-admin); }
+        
+        .creator-box {
+            background-color: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.8rem; color: var(--text-secondary);
+            display: flex; gap: 0.6rem; align-items: flex-start;
+        }
+        .creator-box .icon { color: var(--text-muted); margin-top: 2px; }
+
+        .danger-zone { border-color: rgba(239, 68, 68, 0.4); background-color: rgba(239, 68, 68, 0.02); }
+        .danger-zone .danger-title { color: var(--danger); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .danger-zone p { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4; }
+
+        /* Адаптив */
+        @media (max-width: 1100px) {
+            .settings-grid { grid-template-columns: 1fr; }
+            .settings-right { order: -1; }
+        }
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .settings-content { padding: 1rem; }
+            .form-row { flex-direction: column; }
+            .input-field, .select-field { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <!-- Сайдбар -->
+        <aside class="sidebar">
+            <div>
+                <div class="logo-area">
+                    <div class="logo-icon">IM</div>
+                    <span class="logo-text">IMCTech</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Мои доски
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5zm6 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5zm6 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5z"/></svg>
+                            Доска
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-10"/></svg>
+                            Результаты
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Настройки
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="user-profile">
+                <div class="avatar">АК</div>
+                <div class="user-info">
+                    <div class="name">Алексей К.</div>
+                    <div class="roles">Администратор · Наставник</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Основная часть -->
+        <div class="main-wrapper">
+            <header class="settings-header">
+                <h1 class="page-title">Настройки доски</h1>
+                <button class="btn-primary" onclick="alert('Настройки сохранены!')">
+                    <svg class="save-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Сохранить
+                </button>
+            </header>
+
+            <nav class="settings-tabs">
+                <button class="tab-btn" onclick="switchTab(this, 'general')">Общие</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'members')">Доступ</button>
+            </nav>
+
+            <main class="settings-content">
+                <div class="settings-grid">
+                    <!-- ЛЕВАЯ КОЛОНКА -->
+                    <div class="settings-left">
+                        <div class="card">
+                            <h3 class="card-title">Пригласить участника</h3>
+                            <p class="card-subtitle">Только администратор может добавлять участников и назначать им роли</p>
+                            <form class="invite-form" onsubmit="event.preventDefault(); alert('Приглашение отправлено!');">
+                                <div class="form-row">
+                                    <input type="email" class="input-field" placeholder="email@imctech.ru" required>
+                                    <select class="select-field">
+                                        <option>Студент</option>
+                                        <option>Наставник</option>
+                                    </select>
+                                    <select class="select-field">
+                                        <option>Участник</option>
+                                        <option>Администратор</option>
+                                    </select>
+                                    <button type="submit" class="btn-primary" style="background-color: var(--accent-blue); border:none; padding: 0.6rem 1rem; color:white; border-radius: var(--radius-md); cursor:pointer;">Добавить</button>
+                                </div>
+                                <div class="share-link-row">
+                                    <input type="text" class="input-field" value="https://kanban.imctech.ru/invite/a3f9d7c2" readonly>
+                                    <button type="button" class="btn-secondary" onclick="copyLink(this)">📋 Копировать</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">Участники (5)</h3>
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Пользователь</th>
+                                        <th>Email</th>
+                                        <th>Роль</th>
+                                        <th>Статус</th>
+                                        <th class="text-right">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Создатель (заблокирован для изменений) -->
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="avatar" style="background:#4b5563; color:white;">АК</div>
+                                                <div class="user-meta">
+                                                    <span class="user-name">Алексей К.</span>
+                                                    <span class="user-badge">Создатель</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="user-email">aleksey@imctech.ru</td>
+                                        <td><span style="color:var(--role-mentor); font-weight:500;">Наставник</span></td>
+                                        <td><span style="color:var(--status-admin); font-weight:500;">Администратор</span></td>
+                                        <td class="text-right"><button class="action-btn disabled"></button></td>
+                                    </tr>
+                                    <!-- Обычные участники -->
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="avatar" style="background:#ec4899; color:white;">ЮС</div>
+                                                <div class="user-meta"><span class="user-name">Юлия С.</span></div>
+                                            </div>
+                                        </td>
+                                        <td class="user-email">yulia@imctech.ru</td>
+                                        <td>
+                                            <select class="table-select role-mentor">
+                                                <option value="mentor" selected>Наставник</option>
+                                                <option value="student">Студент</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="table-select status-participant">
+                                                <option value="participant" selected>Участник</option>
+                                                <option value="admin">Администратор</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-right"><button class="action-btn" title="Удалить">🗑</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="avatar" style="background:#14b8a6; color:white;">МД</div>
+                                                <div class="user-meta"><span class="user-name">Михаил Д.</span></div>
+                                            </div>
+                                        </td>
+                                        <td class="user-email">mikhail@imctech.ru</td>
+                                        <td>
+                                            <select class="table-select role-student">
+                                                <option value="student" selected>Студент</option>
+                                                <option value="mentor">Наставник</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="table-select status-participant">
+                                                <option value="participant" selected>Участник</option>
+                                                <option value="admin">Администратор</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-right"><button class="action-btn" title="Удалить">🗑</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="avatar" style="background:#a855f7; color:white;">АП</div>
+                                                <div class="user-meta"><span class="user-name">Анна П.</span></div>
+                                            </div>
+                                        </td>
+                                        <td class="user-email">anna@imctech.ru</td>
+                                        <td>
+                                            <select class="table-select role-student">
+                                                <option value="student" selected>Студент</option>
+                                                <option value="mentor">Наставник</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="table-select status-participant">
+                                                <option value="participant" selected>Участник</option>
+                                                <option value="admin">Администратор</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-right"><button class="action-btn" title="Удалить"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="avatar" style="background:#0ea5e9; color:white;">ДН</div>
+                                                <div class="user-meta"><span class="user-name">Дмитрий Н.</span></div>
+                                            </div>
+                                        </td>
+                                        <td class="user-email">dmitry@imctech.ru</td>
+                                        <td>
+                                            <select class="table-select role-student">
+                                                <option value="student" selected>Студент</option>
+                                                <option value="mentor">Наставник</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="table-select status-admin">
+                                                <option value="participant">Участник</option>
+                                                <option value="admin" selected>Администратор</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-right"><button class="action-btn" title="Удалить">🗑</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ПРАВАЯ КОЛОНКА -->
+                    <div class="settings-right">
+                        <div class="card info-card">
+                            <h4>Роли и статусы</h4>
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem; text-transform:uppercase;">Роли</div>
+                                <div class="role-def"><span class="term term-student">Студент</span><span>Работает с задачами, заполняет результаты и прикрепляет файлы</span></div>
+                                <div class="role-def"><span class="term term-mentor">Наставник</span><span>Проверяет результаты, оставляет комментарии и файлы</span></div>
+                            </div>
+                            <div>
+                                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem; text-transform:uppercase;">Статусы</div>
+                                <div class="role-def"><span class="term term-participant">Участник</span><span>Работает с доской согласно своей роли</span></div>
+                                <div class="role-def"><span class="term term-admin">Админ</span><span>Управляет участниками, ролями и удалением доски</span></div>
+                            </div>
+                        </div>
+
+                        <div class="card creator-box">
+                            <span class="icon"></span>
+                            <div>Создатель доски всегда администратор. Никто не может изменить его роль или статус.</div>
+                        </div>
+
+                        <div class="card danger-zone">
+                            <h4 class="danger-title">️ Опасная зона</h4>
+                            <p>Удалить доску может только её создатель. Это действие необратимо.</p>
+                            <button class="btn-danger" onclick="if(confirm('Вы уверены, что хотите удалить доску? Это действие нельзя отменить.')) alert('Доска удалена.');">🗑 Удалить доску</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Переключение табов
+        function switchTab(btn, tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Здесь можно добавить логику показа/скрытия контента табов
+            if(tabName === 'general') alert('Вкладка "Общие" (заглушка)');
+        }
+
+        // Копирование ссылки
+        function copyLink(btn) {
+            const input = btn.previousElementSibling;
+            input.select();
+            document.execCommand('copy');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Скопировано';
+            setTimeout(() => btn.innerHTML = originalText, 2000);
+        }
+    </script>
+</body>
+</html>

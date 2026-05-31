@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMCTech - Результаты</title>
+    <style>
+        :root {
+            --bg-main: #0b0e14;
+            --bg-surface: #151921;
+            --bg-input: #0d1117;
+            --border-color: #2a303c;
+            --border-hover: #3b4252;
+            --text-primary: #ffffff;
+            --text-secondary: #8a919e;
+            --text-muted: #4b5563;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            
+            --status-accepted: #22c55e;
+            --status-rejected: #ef4444;
+            --status-pending: #f59e0b;
+            --status-review: #3b82f6;
+            
+            --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: 0.2s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout { display: flex; height: 100%; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .logo-area {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0 0.5rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem;
+        }
+        .logo-icon {
+            width: 32px; height: 32px; background-color: var(--accent-blue); color: white;
+            font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+        .logo-text { font-weight: 600; letter-spacing: 0.02em; }
+        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
+        .nav-item a {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem;
+            color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md);
+            font-size: 0.9rem; transition: all var(--transition);
+        }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, 0.04); color: var(--text-primary); }
+        .nav-item.active a { background-color: var(--accent-blue); color: white; font-weight: 500; }
+        .nav-icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .user-profile {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem;
+            border-top: 1px solid var(--border-color); margin-top: auto;
+        }
+        .avatar {
+            width: 32px; height: 32px; background-color: #374151; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); flex-shrink: 0;
+        }
+        .user-info .name { font-size: 0.9rem; font-weight: 500; }
+        .user-info .roles { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* ===== MAIN ===== */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        /* Top bar */
+        .top-bar {
+            height: 64px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+        }
+        .page-title { font-size: 1.25rem; font-weight: 600; }
+
+        /* ===== STATS CARDS ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .stat-icon svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; }
+
+        .stat-icon.blue { background-color: rgba(59, 130, 246, 0.2); }
+        .stat-icon.green { background-color: rgba(34, 197, 94, 0.2); }
+        .stat-icon.red { background-color: rgba(239, 68, 68, 0.2); }
+        .stat-icon.yellow { background-color: rgba(245, 158, 11, 0.2); }
+
+        .stat-info .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .stat-info .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== FILTERS ===== */
+        .filters-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 2rem 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.55rem 0.8rem;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color var(--transition);
+            font-family: inherit;
+        }
+        .filter-select:focus, .filter-input:focus { border-color: var(--accent-blue); }
+        .filter-select option { background-color: var(--bg-surface); }
+        .filter-input::placeholder { color: var(--text-muted); }
+
+        .filter-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a919e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            padding-right: 2rem;
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 2rem 2rem;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .results-table thead {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .results-table th {
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-table td {
+            padding: 1rem 1.25rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .results-table tbody tr {
+            transition: background-color var(--transition);
+        }
+        .results-table tbody tr:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+        .results-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Cell styles */
+        .task-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .task-name { font-weight: 600; color: var(--text-primary); }
+        .task-board { font-size: 0.75rem; color: var(--text-muted); }
+
+        .student-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .student-cell .avatar { width: 28px; height: 28px; font-size: 0.65rem; }
+        .student-name { font-weight: 500; }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .status-accepted {
+            background-color: rgba(34, 197, 94, 0.12);
+            color: var(--status-accepted);
+        }
+        .status-accepted::before { background-color: var(--status-accepted); }
+        .status-rejected {
+            background-color: rgba(239, 68, 68, 0.12);
+            color: var(--status-rejected);
+        }
+        .status-rejected::before { background-color: var(--status-rejected); }
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.12);
+            color: var(--status-pending);
+        }
+        .status-pending::before { background-color: var(--status-pending); }
+        .status-review {
+            background-color: rgba(59, 130, 246, 0.12);
+            color: var(--status-review);
+        }
+        .status-review::before { background-color: var(--status-review); }
+
+        .date-cell { color: var(--text-secondary); font-size: 0.8rem; }
+
+        .comment-preview {
+            max-width: 200px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+        .action-link:hover { color: var(--accent-blue-hover); text-decoration: underline; }
+
+        /* View toggle */
+        .view-toggle {
+            display: flex;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        .view-btn {
+            padding: 0.5rem 0.9rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+        }
+        .view-btn.active {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        .view-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .filters-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        .empty-state svg { width: 64px; height: 64px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; margin-bottom: 1rem; }
+        .empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .empty-state p { font-size: 0.9rem; }
+
+        @media (max-width: 1100px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .stats-row { grid-template-columns: 1fr 1fr; padding: 1rem; }
+            .filters-bar { padding: 0 1rem 1rem; }
+            .table-container { padding: 0 1rem 1rem; }
+        }
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div>
+                <div class="logo-area">
+                    <div class="logo-icon">IM</div>
+                    <span class="logo-text">IMCTech</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Мои доски
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>
+                            Доска
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            Результаты
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            Настройки
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="user-profile">
+                <div class="avatar">АК</div>
+                <div class="user-info">
+                    <div class="name">Алексей К.</div>
+                    <div class="roles">Администратор · Наставник</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-wrapper">
+            <header class="top-bar">
+                <h1 class="page-title">Результаты</h1>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Всего сдач</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Принято</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Возвращено</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">На проверке</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <select class="filter-select">
+                    <option>Все доски</option>
+                    <option>IMCTech Kanban</option>
+                    <option>Маркетинг Q1</option>
+                    <option>Исследование UX</option>
+                </select>
+                <select class="filter-select">
+                    <option>Все статусы</option>
+                    <option>Принято</option>
+                    <option>Возвращено</option>
+                    <option>На проверке</option>
+                    <option>На доработке</option>
+                </select>
+                <select class="filter-select">
+                    <option>Все студенты</option>
+                    <option>Михаил Д.</option>
+                    <option>Юлия С.</option>
+                    <option>Анна П.</option>
+                    <option>Дмитрий Н.</option>
+                </select>
+                <input type="text" class="filter-input" placeholder="Поиск по задаче..." style="width: 200px;">
+
+                <div class="filters-right">
+                    <div class="view-toggle">
+                        <button class="view-btn active" title="Таблица">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                        </button>
+                        <button class="view-btn" title="Карточки">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Задача</th>
+                            <th>Студент</th>
+                            <th>Наставник</th>
+                            <th>Статус</th>
+                            <th>Дата сдачи</th>
+                            <th>Комментарий</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Разработать систему аутентификации</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #14b8a6; color: white;">МД</div>
+                                    <span class="student-name">Михаил Д.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-accepted">Принято</span></td>
+                            <td class="date-cell">14 янв 2025</td>
+                            <td><span class="comment-preview">Отличная работа! middleware работает корректно.</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Написать документацию API</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #a855f7; color: white;">АП</div>
+                                    <span class="student-name">Анна П.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-accepted">Принято</span></td>
+                            <td class="date-cell">12 янв 2025</td>
+                            <td><span class="comment-preview">Документация полная, примеры рабочие.</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Создать форму регистрации</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #ec4899; color: white;">ЮС</div>
+                                    <span class="student-name">Юлия С.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-rejected">Возвращено</span></td>
+                            <td class="date-cell">10 янв 2025</td>
+                            <td><span class="comment-preview">Не хватает валидации email на клиенте.</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Интеграция платёжной системы</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #a855f7; color: white;">О</div>
+                                    <span class="student-name">Олег В.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-pending">На проверке</span></td>
+                            <td class="date-cell">16 янв 2025</td>
+                            <td><span class="comment-preview">—</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Настроить CI/CD пайплайн</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #0ea5e9; color: white;">ДН</div>
+                                    <span class="student-name">Дмитрий Н.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-accepted">Принято</span></td>
+                            <td class="date-cell">8 янв 2025</td>
+                            <td><span class="comment-preview">Пайплайн работает, тесты проходят.</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Дизайн-система компонентов</span>
+                                    <span class="task-board">Исследование UX</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #a855f7; color: white;">Л</div>
+                                    <span class="student-name">Лиза М.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Юлия С.</span></td>
+                            <td><span class="status-badge status-pending">На проверке</span></td>
+                            <td class="date-cell">15 янв 2025</td>
+                            <td><span class="comment-preview">—</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="task-cell">
+                                    <span class="task-name">Оптимизация базы данных</span>
+                                    <span class="task-board">IMCTech Kanban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="avatar" style="background: #64748b; color: white;">В</div>
+                                    <span class="student-name">Виктор С.</span>
+                                </div>
+                            </td>
+                            <td><span style="color: var(--text-secondary);">Алексей К.</span></td>
+                            <td><span class="status-badge status-rejected">Возвращено</span></td>
+                            <td class="date-cell">5 янв 2025</td>
+                            <td><span class="comment-preview">Индексы не добавлены, запросы медленные.</span></td>
+                            <td><a href="#" class="action-link">Открыть</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

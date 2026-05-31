@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMCTech - Мои доски</title>
+    <style>
+        :root {
+            /* Базовые цвета (из login/register) */
+            --bg-main: #0b0e14;
+            --bg-surface: #151921;
+            --bg-input: #0d1117;
+            --border-color: #2a303c;
+            --border-hover: #3b4252;
+            --text-primary: #ffffff;
+            --text-secondary: #8a919e;
+            --text-muted: #4b5563;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --yandex-red: #fc3f1d;
+            
+            /* Цвета тегов и статусов */
+            --tag-mentor: #f59e0b;
+            --tag-admin: #a855f7;
+            --tag-student: #3b82f6;
+            --tag-participant: #22c55e;
+            --status-gray: #6b7280;
+            --status-blue: #3b82f6;
+            --status-green: #22c55e;
+            
+            --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: 0.2s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Основная сетка страницы */
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ===== САЙДБАР ===== */
+        .sidebar {
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 0.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--accent-blue);
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+
+        .logo-text {
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            transition: all var(--transition);
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active a {
+            background-color: var(--accent-blue);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Профиль пользователя внизу сайдбара */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #374151;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .user-info .name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .user-info .roles {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+        .main-content {
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Сетка досок */
+        .boards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Карточка доски - КОМПАКТНАЯ ВЕРСИЯ */
+        .board-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .board-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+        }
+
+        .card-menu {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            transition: background-color var(--transition);
+        }
+
+        .card-menu:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: -0.25rem;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        /* Теги */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tag-mentor { color: var(--tag-mentor); }
+        .tag-admin { color: var(--tag-admin); }
+        .tag-student { color: var(--tag-student); }
+        .tag-participant { color: var(--tag-participant); }
+
+        /* Прогресс */
+        .card-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--status-green);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        /* Статусы (точки) */
+        .card-statuses {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .dot-gray { background-color: var(--status-gray); }
+        .dot-blue { background-color: var(--status-blue); }
+        .dot-green { background-color: var(--status-green); }
+
+        /* Футер карточки */
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 0.4rem;
+        }
+
+        .avatars {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatars .avatar {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--bg-surface);
+            margin-right: -8px;
+            position: relative;
+            z-index: 1;
+            font-size: 0.65rem;
+        }
+
+        .avatars .avatar:first-child { z-index: 3; }
+        .avatars .avatar:nth-child(2) { z-index: 2; }
+        .avatars .avatar:nth-child(3) { z-index: 1; }
+
+        .avatar-plus {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        .time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Карточка "Создать новую" - КОМПАКТНАЯ */
+        .board-card.create-new {
+            border-style: dashed;
+            border-color: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.6rem;
+            cursor: pointer;
+            min-height: 200px;
+        }
+
+        .board-card.create-new:hover {
+            border-color: var(--accent-blue);
+            background-color: rgba(59, 130, 246, 0.03);
+        }
+
+        .create-icon {
+            width: 36px;
+            height: 36px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            transition: all var(--transition);
+        }
+
+        .board-card.create-new:hover .create-icon {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .create-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none; /* Для мобильных можно добавить бургер-меню */
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .boards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <!-- Сайдбар -->
+        <aside class="sidebar">
+            <div>
+                <div class="logo-area">
+                    <div class="logo-icon">IM</div>
+                    <span class="logo-text">IMCTech</span>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Мои доски
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5zm6 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5zm6 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V5z"/></svg>
+                            Доска
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-10"/></svg>
+                            Результаты
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">
+                            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Настройки
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">АК</div>
+                <div class="user-info">
+                    <div class="name">Алексей К.</div>
+                    <div class="roles">Администратор · Наставник</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Мои доски</h1>
+                <p>Все доски, к которым у вас есть доступ</p>
+            </header>
+
+            <div class="boards-grid">
+                <!-- Карточка 1 -->
+                <article class="board-card">
+                    <div class="card-header">
+                        <div class="card-icon">IM</div>
+                        <button class="card-menu">•••</button>
+                    </div>
+                    <div>
+                        <h3 class="card-title">IMCTech Kanban</h3>
+                        <p class="card-desc">Основная разработка продукта</p>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-mentor">Наставник</span>
+                        <span class="tag tag-admin">Администратор</span>
+                    </div>
+                    <div class="card-progress">
+                        <div class="progress-info">
+                            <span>Выполнено</span>
+                            <span>30%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                    <div class="card-statuses">
+                        <span class="status"><span class="dot dot-gray"></span>4 не начато</span>
+                        <span class="status"><span class="dot dot-blue"></span>3 в работе</span>
+                        <span class="status"><span class="dot dot-green"></span>3 готово</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="avatars">
+                            <div class="avatar" style="background:#6366f1; color:white;">И</div>
+                            <div class="avatar" style="background:#ec4899; color:white;">М</div>
+                            <div class="avatar" style="background:#14b8a6; color:white;">Д</div>
+                            <span class="avatar-plus">+2</span>
+                        </div>
+                        <span class="time">2 ч назад</span>
+                    </div>
+                </article>
+
+                <!-- Карточка 2 -->
+                <article class="board-card">
+                    <div class="card-header">
+                        <div class="card-icon">M</div>
+                        <button class="card-menu">•••</button>
+                    </div>
+                    <div>
+                        <h3 class="card-title">Маркетинг Q1</h3>
+                        <p class="card-desc">Задачи маркетинговой команды на первый квартал</p>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-student">Студент</span>
+                        <span class="tag tag-participant">Участник</span>
+                    </div>
+                    <div class="card-progress">
+                        <div class="progress-info">
+                            <span>Выполнено</span>
+                            <span>50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    <div class="card-statuses">
+                        <span class="status"><span class="dot dot-gray"></span>6 не начато</span>
+                        <span class="status"><span class="dot dot-blue"></span>2 в работе</span>
+                        <span class="status"><span class="dot dot-green"></span>8 готово</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="avatars">
+                            <div class="avatar" style="background:#f59e0b; color:white;">А</div>
+                            <div class="avatar" style="background:#3b82f6; color:white;">К</div>
+                            <span class="avatar-plus">+1</span>
+                        </div>
+                        <span class="time">1 д назад</span>
+                    </div>
+                </article>
+
+                <!-- Карточка 3 -->
+                <article class="board-card">
+                    <div class="card-header">
+                        <div class="card-icon">U</div>
+                        <button class="card-menu">•••</button>
+                    </div>
+                    <div>
+                        <h3 class="card-title">Исследование UX</h3>
+                        <p class="card-desc">Пользовательские интервью и анализ</p>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-mentor">Наставник</span>
+                        <span class="tag tag-participant">Участник</span>
+                    </div>
+                    <div class="card-progress">
+                        <div class="progress-info">
+                            <span>Выполнено</span>
+                            <span>63%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 63%"></div>
+                        </div>
+                    </div>
+                    <div class="card-statuses">
+                        <span class="status"><span class="dot dot-gray"></span>2 не начато</span>
+                        <span class="status"><span class="dot dot-blue"></span>1 в работе</span>
+                        <span class="status"><span class="dot dot-green"></span>5 готово</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="avatars">
+                            <div class="avatar" style="background:#8b5cf6; color:white;">О</div>
+                            <div class="avatar" style="background:#10b981; color:white;">С</div>
+                        </div>
+                        <span class="time">3 д назад</span>
+                    </div>
+                </article>
+
+                <!-- Карточка "Создать новую" -->
+                <button class="board-card create-new">
+                    <div class="create-icon">+</div>
+                    <span class="create-text">Создать новую доску</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
