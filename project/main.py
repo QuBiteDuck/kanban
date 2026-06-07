@@ -52,7 +52,7 @@ app.include_router(auth_router)
 app.include_router(boards_router)
 app.include_router(invitations_router)
 app.include_router(tasks_router)
-app.include_router(results_router)
+# app.include_router(results_router)
 app.include_router(files_router)
 
 # Монтирование статических файлов (если есть frontend в папке static)
